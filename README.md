@@ -16,7 +16,7 @@ This application provides a user-friendly GUI for automating signup processes on
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/sohail-eng/auto-signup-for-rocketreach.co.git
-cd rocket-reach-signup
+cd auto-signup-for-rocketreach.co
 ```
 
 ### 2. Create a Virtual Environment (Recommended)
