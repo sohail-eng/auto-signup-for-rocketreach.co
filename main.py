@@ -113,13 +113,12 @@ def process_data():
     with open("emails.txt", "w") as f:
         f.write('\n'.join(remaining_emails))
 
-    csv_data = "Username,Email,Password"
-    for username, email in processed:
-        if str(username).strip() and str(email).strip():
-            csv_data = f'{csv_data}\n"{username}","{email}","{email}"'
+    emails_data = "\n".join([
+        email for _, email in processed
+    ])
 
-    with open(f"accounts_{uuid4()}.csv", "w") as f:
-        f.write(csv_data)
+    with open(f"accounts_{uuid4()}.txt", "w") as f:
+        f.write(emails_data)
 
 
 # Function to run the process and save
