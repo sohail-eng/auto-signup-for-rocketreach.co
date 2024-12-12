@@ -1,11 +1,11 @@
 from .rocket_reach import RocketReach
 
 
-def fill_data_into_rocket_reach(data: list, delay: int):
+def fill_data_into_rocket_reach(data: list, delay: int, driver):
     processed_list = []
     un_successful_list = []
     try:
-        j = RocketReach(proxy='')
+        j = RocketReach(proxy='', driver=driver)
         for username, email in data:
             if j.fill_information(
                 username=username,

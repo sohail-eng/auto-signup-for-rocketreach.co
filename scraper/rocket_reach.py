@@ -2,7 +2,6 @@ import logging
 
 from selenium.webdriver.common.by import By
 
-from .actions import action_click
 from .objects import Scraper
 
 logging.basicConfig()
@@ -24,11 +23,10 @@ class RocketReach(Scraper):
         self.base_url = "https://rocketreach.co/"
 
         self.sign_up_url = f"{self.base_url}signup?next=%2F"
-        self.logout_link = f"{self.base_url}/logout"
+        self.logout_link = f"{self.base_url}logout"
 
         if not self.driver:
             self.driver = self.initialize(proxy=proxy)
-            self.driver.get(self.base_url)
 
     def fill_information(
             self,

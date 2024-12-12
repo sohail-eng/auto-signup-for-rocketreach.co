@@ -43,12 +43,9 @@ class Scraper:
         self.driver.execute_script('alert("Focus window")')
         self.driver.switch_to.alert.accept()
 
-    def initialize(self, proxy):
-        temp = self.driver
-        if temp:
-            temp.maximize_window()
+    @classmethod
+    def initialize(cls, proxy):
         try:
-
             options = webdriver.ChromeOptions()
             # options.add_argument('--headless')
             options.add_argument('--disable-gpu')

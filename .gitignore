@@ -164,3 +164,6 @@ cython_debug/
 *.csv
 emails.txt
 names.txt
+
+accounts*.csv
+*.pkl

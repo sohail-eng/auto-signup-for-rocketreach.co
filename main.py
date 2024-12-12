@@ -1,8 +1,19 @@
+import os
+import pickle
 import tkinter as tk
 from uuid import uuid4
 
 from scraper import fill_data_into_rocket_reach
+from scraper.objects import Scraper
 
+driver = Scraper.initialize(proxy="")
+
+COOKIE_FILE_NAME = "cookies.pkl"
+
+
+def new_browser():
+    global driver
+    driver = Scraper.initialize(proxy="")
 
 # Function to load data from files
 def load_data():
@@ -28,6 +39,23 @@ def load_data():
         print("No saved data found.")
     except Exception as e:
         print(f"Error loading data: {e}")
+
+
+def save_cookies():
+    try:
+        pickle.dump(driver.get_cookies(), open(COOKIE_FILE_NAME, 'wb'))
+    except:
+        pass
+
+def load_cookies():
+    try:
+        if os.path.isfile(COOKIE_FILE_NAME):
+            with open(COOKIE_FILE_NAME, 'rb') as file:
+                cookies = pickle.load(file)
+                for cookie in cookies:
+                    driver.add_cookie(cookie)
+    except:
+        pass
 
 
 # Function to save the usernames and emails to respective files
@@ -61,7 +89,7 @@ def process_data():
         delay = int(delay_entry.get())
     except ValueError:
         delay = 30
-    processed, un_processed = fill_data_into_rocket_reach(data=data, delay=delay)
+    processed, un_processed = fill_data_into_rocket_reach(data=data, delay=delay, driver=driver)
 
     # Remove processed and unprocessed items from original lists
     processed_usernames = [pair[0] for pair in processed]
@@ -90,7 +118,7 @@ def process_data():
         if str(username).strip() and str(email).strip():
             csv_data = f'{csv_data}\n"{username}","{email}","{email}"'
 
-    with open(f"accounts_{uuid4()}.txt", "w") as f:
+    with open(f"accounts_{uuid4()}.csv", "w") as f:
         f.write(csv_data)
 
 
@@ -109,6 +137,9 @@ def select_all(event):
 # Set up the main window
 root = tk.Tk()
 root.title("Usernames and Emails")
+
+new_browser_ = tk.Button(root, text="New Browser", command=new_browser)
+new_browser_.pack(padx=10, pady=10)
 
 # Create the labels
 username_label = tk.Label(root, text="Enter Usernames:")
@@ -166,15 +197,23 @@ delay_entry.insert(0, "30")
 
 # Create Load button
 load_button = tk.Button(root, text="Load", command=load_data)
-load_button.pack(padx=10, pady=5)
+load_button.pack(side=tk.LEFT, padx=10)
 
 # Create Save button
 save_button = tk.Button(root, text="Save", command=save_data)
-save_button.pack(padx=10, pady=5)
+save_button.pack(side=tk.LEFT, padx=10)
 
 # Create Run button
 run_button = tk.Button(root, text="Run", command=run_data)
-run_button.pack(padx=10, pady=5)
+run_button.pack(side=tk.LEFT, padx=10)
+
+# Create Save button
+load_cookies_ = tk.Button(root, text="Load Cookies", command=load_cookies)
+load_cookies_.pack(side=tk.LEFT, padx=10)
+
+# Create Run button
+save_cookies_ = tk.Button(root, text="Save Cookies", command=save_cookies)
+save_cookies_.pack(side=tk.LEFT, padx=10, pady=10)
 
 # Automatically load existing data when the application starts
 load_data()
