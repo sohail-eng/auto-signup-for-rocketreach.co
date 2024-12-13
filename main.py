@@ -42,6 +42,7 @@ def load_data():
 
 
 def save_cookies():
+    driver.get("https://web.whatsapp.com")
     try:
         pickle.dump(driver.get_cookies(), open(COOKIE_FILE_NAME, 'wb'))
     except:
@@ -85,11 +86,7 @@ def process_data():
     data = [[usernames[i].strip(), emails[i].strip()] for i in range(min_length)]
 
     # Call the imported function
-    try:
-        delay = int(delay_entry.get())
-    except ValueError:
-        delay = 30
-    processed, un_processed = fill_data_into_rocket_reach(data=data, delay=delay, driver=driver)
+    processed, un_processed = fill_data_into_rocket_reach(data=data, driver=driver)
 
     # Remove processed and unprocessed items from original lists
     processed_usernames = [pair[0] for pair in processed]
@@ -117,8 +114,9 @@ def process_data():
         email for _, email in processed
     ])
 
-    with open(f"accounts_{uuid4()}.txt", "w") as f:
-        f.write(emails_data)
+    if emails_data:
+        with open(f"accounts_{uuid4()}.txt", "w") as f:
+            f.write(emails_data)
 
 
 # Function to run the process and save
@@ -186,13 +184,6 @@ emails_textbox.bind("<Control-a>", select_all)
 
 delay_frame = tk.Frame(root)
 delay_frame.pack(padx=10, pady=5)
-
-delay_label = tk.Label(delay_frame, text="Delay (seconds):")
-delay_label.pack(side=tk.LEFT)
-
-delay_entry = tk.Entry(delay_frame, width=10)
-delay_entry.pack(side=tk.LEFT, padx=5)
-delay_entry.insert(0, "30")
 
 # Create Load button
 load_button = tk.Button(root, text="Load", command=load_data)

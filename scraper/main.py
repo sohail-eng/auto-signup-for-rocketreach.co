@@ -1,7 +1,7 @@
 from .rocket_reach import RocketReach
 
 
-def fill_data_into_rocket_reach(data: list, delay: int, driver):
+def fill_data_into_rocket_reach(data: list, driver):
     processed_list = []
     un_successful_list = []
     try:
@@ -10,9 +10,10 @@ def fill_data_into_rocket_reach(data: list, delay: int, driver):
             if j.fill_information(
                 username=username,
                 email=email,
-                password=email,
-                delay=delay
+                password=email
             ):
+                if j.no_browser:
+                    break
                 processed_list.append([username, email])
             else:
                 un_successful_list.append([username, email])
