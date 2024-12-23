@@ -1,12 +1,9 @@
 import logging
 
-from pynput.keyboard import Key, Controller
-
+from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver.common.by import By
 
 from .objects import Scraper
-
-from selenium.common.exceptions import NoSuchWindowException
 
 logging.basicConfig()
 
@@ -96,21 +93,6 @@ class RocketReach(Scraper):
                 if self.no_browser:
                     return False
                 return response
-
-            self.focus()
-
-            self.get_elements_by_time(
-                by=By.XPATH,
-                value='//button[contains(@class,"next")]',
-                seconds=15,
-                single=True
-            )
-
-            keyboard = Controller()
-            keyboard.press(Key.enter)
-            keyboard.release(Key.enter)
-
-            self.wait(10)
 
             return self.middle_method_for_retry(
                 method_name=self.successful_logout
