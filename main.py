@@ -1,52 +1,84 @@
 import os
 import pickle
+import tkinter
 import tkinter as tk
+from pkgutil import get_loader
 from uuid import uuid4
 
 from scraper import fill_data_into_rocket_reach
 from scraper.objects import Scraper
 
 driver = Scraper.initialize(proxy="")
+driver.close()
 
 COOKIE_FILE_NAME = "cookies.pkl"
 
 
 def new_browser():
     global driver
+    try:
+        driver.close()
+    except Exception as e:
+        print(e)
     driver = Scraper.initialize(proxy="")
 
-# Function to load data from files
-def load_data():
+def _load_data_from_file(file_name, text_box):
     try:
-        # Load usernames from names.txt
-        with open("names.txt", "r") as f:
-            usernames = f.read().strip().split('\n')
+        with open(file_name, "r") as f:
+            file_data = f.read().strip().split('\n')
 
-        # Load emails from emails.txt
-        with open("emails.txt", "r") as f:
-            emails = f.read().strip().split('\n')
+        text_box.delete("1.0", tk.END)
+        text_box.insert(tk.END, '\n'.join(file_data))
 
-        # Clear existing text in textboxes
-        usernames_textbox.delete("1.0", tk.END)
-        emails_textbox.delete("1.0", tk.END)
-
-        # Insert loaded data into textboxes
-        usernames_textbox.insert(tk.END, '\n'.join(usernames))
-        emails_textbox.insert(tk.END, '\n'.join(emails))
-
-        print("Data loaded successfully!")
     except FileNotFoundError:
         print("No saved data found.")
     except Exception as e:
         print(f"Error loading data: {e}")
 
+# Function to load data from files
+def load_data():
+    _load_data_from_file(
+        file_name="names.txt",
+        text_box=usernames_textbox,
+    )
+
+    _load_data_from_file(
+        file_name="emails.txt",
+        text_box=emails_textbox,
+    )
+
+    _load_data_from_file(
+        file_name="limit_account.txt",
+        text_box=limit_count_textbox,
+    )
+
+    _load_data_from_file(
+        file_name="initial_link.txt",
+        text_box=link_textbox,
+    )
+
+    print("Data loaded successfully!")
 
 def save_cookies():
+    if not driver:
+        new_browser()
     driver.get("https://web.whatsapp.com")
     try:
         pickle.dump(driver.get_cookies(), open(COOKIE_FILE_NAME, 'wb'))
     except:
         pass
+
+def save_limit_link():
+    account_length = int(limit_count_textbox.get("1.0", tk.END).strip())
+    initial_link = link_textbox.get("1.0", tk.END).strip()
+
+    with open("limit_account.txt", 'w') as file:
+        file.write(str(account_length))
+
+    with open("initial_link.txt", 'w') as file:
+        file.write(initial_link)
+
+    print("Data saved successfully!")
 
 def load_cookies():
     try:
@@ -54,6 +86,8 @@ def load_cookies():
             with open(COOKIE_FILE_NAME, 'rb') as file:
                 cookies = pickle.load(file)
                 for cookie in cookies:
+                    if not driver:
+                        new_browser()
                     driver.add_cookie(cookie)
     except:
         pass
@@ -85,6 +119,12 @@ def process_data():
     min_length = min(len(usernames), len(emails))
     data = [[usernames[i].strip(), emails[i].strip()] for i in range(min_length)]
 
+    try:
+        driver.close()
+    except Exception as e:
+        print(e)
+    new_browser()
+
     # Call the imported function
     processed, un_processed = fill_data_into_rocket_reach(data=data, driver=driver)
 
@@ -92,9 +132,16 @@ def process_data():
     processed_usernames = [pair[0] for pair in processed]
     processed_emails = [pair[1] for pair in processed]
 
+    un_processed_usernames = [pair[0] for pair in un_processed]
+    un_processed_emails = [pair[1] for pair in un_processed]
+
     # Remove processed items from original lists
     remaining_usernames = [u for u in usernames if u.strip() not in processed_usernames]
     remaining_emails = [e for e in emails if e.strip() not in processed_emails]
+
+    # Remove processed items from original lists
+    remaining_usernames = [u for u in remaining_usernames if u.strip() not in un_processed_usernames]
+    remaining_emails = [e for e in remaining_emails if e.strip() not in un_processed_emails]
 
     # Update textboxes and save files with remaining data
     usernames_textbox.delete("1.0", tk.END)
@@ -109,6 +156,13 @@ def process_data():
 
     with open("emails.txt", "w") as f:
         f.write('\n'.join(remaining_emails))
+
+    # Save updated data
+    with open(f"invalid_names_{str(uuid4())}.txt", "w") as f:
+        f.write('\n'.join(un_processed_usernames))
+
+    with open(f"invalid_emails_{str(uuid4())}.txt", "w") as f:
+        f.write('\n'.join(un_processed_emails))
 
     emails_data = "\n".join([
         email for _, email in processed
@@ -137,6 +191,27 @@ root.title("Usernames and Emails")
 
 new_browser_ = tk.Button(root, text="New Browser", command=new_browser)
 new_browser_.pack(padx=10, pady=10)
+
+frame_link = tk.Frame(root)
+frame_link.pack(padx=10, pady=5)
+
+link_label = tk.Label(frame_link, text="Enter link:")
+link_label.pack(side=tk.LEFT)
+
+link_textbox = tk.Text(frame_link, height=1, width=40)
+link_textbox.pack(fill=tk.BOTH)
+
+limit_count_frame = tk.Frame(root)
+limit_count_frame.pack(padx=10, pady=5)
+
+limit_count_label = tk.Label(limit_count_frame, text="Enter limit:")
+limit_count_label.pack(side=tk.LEFT)
+
+limit_count_textbox = tk.Text(limit_count_frame, height=1, width=12)
+limit_count_textbox.pack(side=tk.LEFT, fill=tk.X)
+
+save_link_button = tk.Button(limit_count_frame, text="Save", command=save_limit_link)
+save_link_button.pack(side=tk.RIGHT)
 
 # Create the labels
 username_label = tk.Label(root, text="Enter Usernames:")

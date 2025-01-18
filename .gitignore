@@ -164,5 +164,11 @@ cython_debug/
 emails.txt
 names.txt
 
+invalid_names_*.txt
+invalid_emails_*.txt
+
+initial_link.txt
+limit_account.txt
+
 accounts*.txt
 *.pkl
