@@ -24,3 +24,17 @@ def get_initial_link():
     except Exception as e:
         print(f"Error loading data: {e}")
     return 10
+
+
+def get_sleep_seconds():
+    try:
+        with open("sleep_seconds.txt", "r") as f:
+            sleep_seconds = f.read().strip()
+        return int(sleep_seconds)
+    except FileNotFoundError:
+        print("No saved data found.")
+    except ValueError:
+        print("No valid data")
+    except Exception as e:
+        print(f"Error loading data: {e}")
+    return 5

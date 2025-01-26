@@ -1,4 +1,6 @@
-from .file_operations import get_account_limit, get_initial_link
+from time import sleep
+
+from .file_operations import get_account_limit, get_initial_link, get_sleep_seconds
 from .rocket_reach import RocketReach
 
 
@@ -12,6 +14,8 @@ def fill_data_into_rocket_reach(data: list, driver):
 
     account_length = get_account_limit()
     initial_link = get_initial_link()
+    sleep_seconds = get_sleep_seconds()
+
     try:
         try:
             driver.get(initial_link)
@@ -20,6 +24,7 @@ def fill_data_into_rocket_reach(data: list, driver):
         j = RocketReach(proxy='', driver=driver)
         counter = 0
         for username, email in data:
+            sleep(sleep_seconds)
             counter = counter + 1
             if counter > account_length:
                 counter = 0

@@ -170,5 +170,7 @@ invalid_emails_*.txt
 initial_link.txt
 limit_account.txt
 
+sleep_seconds.txt
+
 accounts*.txt
 *.pkl

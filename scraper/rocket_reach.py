@@ -75,6 +75,10 @@ class RocketReach(Scraper):
                 method_name=self.signup_successful_or_error
             )
 
+            if "phone_verify" in str(self.driver.current_url):
+                self.no_browser = True
+                return False
+
             if not response:
                 if self.no_browser:
                     return False
@@ -114,7 +118,7 @@ class RocketReach(Scraper):
         inner_count = 0
         self.error_email = False
         while True:
-            if str(self.driver.current_url.split("?")[0]).startswith("https://rocketreach.co/phone_verify"):
+            if "phone_verify" in str(self.driver.current_url):
                 self.no_browser = True
                 return False
             if self.driver.current_url.split("?")[0] == self.profile_link.split("?")[0]:

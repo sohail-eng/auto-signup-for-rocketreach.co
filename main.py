@@ -57,6 +57,11 @@ def load_data():
         text_box=link_textbox,
     )
 
+    _load_data_from_file(
+        file_name="sleep_seconds.txt",
+        text_box=sleep_seconds_textbox,
+    )
+
     print("Data loaded successfully!")
 
 def save_cookies():
@@ -71,12 +76,16 @@ def save_cookies():
 def save_limit_link():
     account_length = int(limit_count_textbox.get("1.0", tk.END).strip())
     initial_link = link_textbox.get("1.0", tk.END).strip()
+    sleep_seconds_text = sleep_seconds_textbox.get("1.0", tk.END).strip()
 
     with open("limit_account.txt", 'w') as file:
         file.write(str(account_length))
 
     with open("initial_link.txt", 'w') as file:
         file.write(initial_link)
+
+    with open("sleep_seconds.txt", 'w') as file:
+        file.write(sleep_seconds_text)
 
     print("Data saved successfully!")
 
@@ -200,6 +209,15 @@ link_label.pack(side=tk.LEFT)
 
 link_textbox = tk.Text(frame_link, height=1, width=40)
 link_textbox.pack(fill=tk.BOTH)
+
+frame_seconds = tk.Frame(root)
+frame_seconds.pack(padx=10, pady=5)
+
+seconds_label = tk.Label(frame_link, text="Seconds:")
+seconds_label.pack(side=tk.LEFT)
+
+sleep_seconds_textbox = tk.Text(frame_link, height=1, width=2)
+sleep_seconds_textbox.pack(fill=tk.BOTH)
 
 limit_count_frame = tk.Frame(root)
 limit_count_frame.pack(padx=10, pady=5)
